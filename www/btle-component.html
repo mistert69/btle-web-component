@@ -1,0 +1,116 @@
+
+<link rel="import"
+      href="bower_components/polymer/polymer.html">
+
+<dom-module id="btle-component">
+ <template>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no
+		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+	
+	
+    
+	
+<!--	<script src="js/app.js"></script>   --->
+	
+      
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+     
+    <div id="info">Not Connected</div> 	 
+   
+   <!--       SUPPORT FUNCTIONS    -------> 
+    <script type="text/javascript">
+    var BTLE = {};
+    BTLE.onDeviceReady = function()
+    {
+	BTLE.showInfo('Activate the SensorTag and tap Start.');
+    };
+
+    BTLE.showInfo = function(info)
+    {
+	document.getElementById('info').innerHTML = info;
+    };
+
+    BTLE.onStartButton = function()
+    {
+	//app.onStopButton();
+        evothings.bledevice.connect(
+	    'LED', // BLE name
+	    function(device)
+	    {
+	      console.log('connected!');
+	      device.writeDataArray(new Uint8Array([1]));
+	      evothings.bledevice.close();
+	    },
+	    function(errorCode)
+	    {
+	      console.log('Error: ' + errorCode);
+	    });
+	//app.startScan();
+	BTLE.showInfo('Status: Starting...');
+    };
+    </script>
+
+    <!--       GUI STUFF    -------> 
+    <script type="text/javascript">
+           var static_started = 0;
+
+
+           var click_erea = document.getElementById("info");
+           click_erea.onclick = function (e) {
+                     if (static_started == 0)
+                     {
+                        this.style.webkitAnimation = 'fade 3000ms infinite'
+			this.style.background = 'green'; 
+                        
+                        
+			static_started = 1;
+                        BTLE.onStartButton()
+                     }
+                     else
+                     {
+                        this.style.webkitAnimation = ''
+			this.style.background = 'red'; 
+
+			static_started  = 0;
+                        BTLE.onStopButton()
+                      }					 
+              };
+    </script>  	
+
+</body>
+
+ </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: "btle-component",
+    ready: function() {
+      
+    },
+    properties: {
+       DeviceName: String,
+       isConnected: { type: Boolean, 
+                      readOnly: true
+       },
+       NotifyData: {
+         type: Array,
+         readOnly: true,
+         notify: true
+       },
+       ReadData: {
+         type: Array,
+         readonly: true
+       },
+       WriteData: Array
+    },   
+  });
+</script>
+
